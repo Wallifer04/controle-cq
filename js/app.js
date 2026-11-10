@@ -912,6 +912,7 @@ function telaLogin(modo = 'entrar', msg = '') {
         <li>${ic('pencil')}Justificativa obrigatória para testes fora do prazo</li>
       </ul>
       <img class="login-marca" src="icons/marca.png" alt="Marca da equipe" hidden onload="this.hidden=false" onerror="this.remove()">
+      <div class="login-equipe">As Meninas Superradioativas</div>
       <h1>Controle de qualidade, sempre em dia.</h1>
       <p>Testes dos equipamentos de Medicina Nuclear conforme a ${NORMA}.</p>
     </section>

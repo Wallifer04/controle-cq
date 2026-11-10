@@ -570,3 +570,10 @@ body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none
 /* marca da equipe no painel de entrada: aparece se existir o arquivo icons/marca.png */
 .login-marca { display: block; align-self: flex-start; width: auto; height: auto; max-width: min(100%, 300px); max-height: 150px; object-fit: contain; margin: 28px 0 -16px; border-radius: 18px; position: relative; z-index: 1; }
 @media (min-width: 900px) { .login-marca { max-width: 380px; max-height: 200px; margin: 20px 0 -8px; } .login-marca + h1 { margin-top: 28px; } }
+/* painel de entrada nas cores da equipe (rosa, azul e verde) */
+.login-hero { background: radial-gradient(90% 70% at 0% 0%, #F0569B 0%, transparent 60%), radial-gradient(90% 80% at 100% 100%, #2FA65A 0%, transparent 62%), linear-gradient(150deg, #E23D86 0%, #2E9FDD 52%, #27A05A 100%); }
+.login-hero h1, .login-hero p, .login-hero .brand, .login-feats, .login-equipe { text-shadow: 0 1px 10px rgba(10, 20, 60, .28); position: relative; z-index: 1; }
+.login-hero p { opacity: .95; }
+.login-equipe { display: inline-block; align-self: flex-start; margin-top: 26px; padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -.005em; }
+.login-equipe + h1 { margin-top: 14px; }
+@media (min-width: 900px) { .login-equipe { font-size: 17px; margin-top: 22px; } .login-marca + .login-equipe + h1, .login-equipe + h1 { margin-top: 14px; } }
