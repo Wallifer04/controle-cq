@@ -1,0 +1,15 @@
+{
+  "name": "Controle de CQ · Medicina Nuclear",
+  "short_name": "Controle CQ",
+  "description": "Controle de periodicidade dos testes de controle de qualidade (CNEN/ANSN 3.05).",
+  "lang": "pt-BR",
+  "start_url": "./#inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F5FB",
+  "theme_color": "#1D3FD1",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
