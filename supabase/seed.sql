@@ -115,6 +115,7 @@ select * from (values
   ('nm630.correg-ga', '2026-02-01'::date, 'execucao', 'conforme', null, false, 'Importado da planilha', '2026-02-01T12:00:00Z'::timestamptz),
   ('nm630.correg-ga', '2026-08-01'::date, 'execucao', 'conforme', null, false, 'Importado da planilha', '2026-08-01T12:00:00Z'::timestamptz),
   ('nm630.correg-tl', '2025-10-01'::date, 'execucao', 'conforme', 'Depois de out/25: relatório não encontrado na planilha.', false, 'Importado da planilha', '2025-10-01T12:00:00Z'::timestamptz),
+  ('nm630.correg-tl', '2026-05-01'::date, 'execucao', 'conforme', 'Informado pela equipe em 10/11/2026 (não constava na planilha).', false, 'Importado da planilha', '2026-05-01T12:00:00Z'::timestamptz),
   ('nm630.furos', '2026-01-01'::date, 'execucao', 'conforme', null, false, 'Importado da planilha', '2026-01-01T12:00:00Z'::timestamptz),
   ('nm630.furos', '2026-08-01'::date, 'execucao', 'conforme', null, false, 'Importado da planilha', '2026-08-01T12:00:00Z'::timestamptz),
   ('nm630.unif-ga', '2026-02-01'::date, 'execucao', 'conforme', null, false, 'Importado da planilha', '2026-02-01T12:00:00Z'::timestamptz),
