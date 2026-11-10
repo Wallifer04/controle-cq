@@ -572,11 +572,13 @@ body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none
 .login-hero h1, .login-hero p, .login-hero .brand, .login-feats, .login-equipe { text-shadow: 0 1px 10px rgba(10, 20, 60, .28); position: relative; z-index: 1; }
 .login-hero p { opacity: .95; }
 /* nome da equipe: grande, em negrito, acima da imagem */
-.login-hero h1.login-equipe { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1.02; letter-spacing: -.03em; margin: 30px 0 0; max-width: none; text-shadow: 0 2px 0 rgba(20, 16, 70, .55), 0 6px 22px rgba(20, 16, 70, .35); }
-.login-equipe span { display: block; font-size: .62em; letter-spacing: .01em; text-transform: uppercase; color: #fff; }
-.login-equipe b { display: block; font-weight: 900; color: #FFE94A; -webkit-text-stroke: 1.5px #1B1464; paint-order: stroke fill; }
+.login-hero h1.login-equipe { font-family: 'Fredoka', var(--font-display); font-weight: 700; font-size: 40px; line-height: .98; letter-spacing: 0; margin: 30px 0 0; max-width: none; text-shadow: none; transform: rotate(-3deg); transform-origin: left bottom; }
+.login-equipe span { display: inline-block; font-size: .5em; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #1B1464; background: #FFE94A; padding: .18em .7em .14em; border-radius: 999px; margin: 0 0 .3em .15em; box-shadow: 0 3px 0 #1B1464; }
+.login-equipe b { display: block; font-weight: 700; color: #FF3D9A; -webkit-text-stroke: .2em #fff; paint-order: stroke fill; text-shadow: 0 .09em 0 #1B1464, 0 .16em .3em rgba(27, 20, 100, .45); padding: .06em .12em .12em; margin-left: -.02em; }
 /* imagem da equipe (icons/marca.png): o branco do fundo se desfaz num brilho oval */
 .login-marca-box { position: relative; z-index: 1; align-self: flex-start; width: min(100%, 340px); margin: 14px 0 6px; padding: 14px 22px; background: radial-gradient(closest-side, #fff 0%, #fff 62%, rgba(255,255,255,.6) 80%, rgba(255,255,255,0) 100%); }
 .login-marca { display: block; width: 100%; height: auto; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
 .login-hero p { margin-top: 10px; }
-@media (min-width: 900px) { .login-hero h1.login-equipe { font-size: 54px; margin-top: auto; } .login-marca-box { width: min(100%, 440px); } }
+@media (min-width: 900px) { .login-hero h1.login-equipe { font-size: 62px; margin-top: auto; } .login-marca-box { width: min(100%, 440px); } }
+@font-face { font-family: 'Fredoka'; font-weight: 600; font-display: swap; src: url('fonts/fredoka-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-weight: 700; font-display: swap; src: url('fonts/fredoka-latin-700-normal.woff2') format('woff2'); }
