@@ -16,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Acesso diário
-        run: curl -fsS "$SB_URL/rest/v1/equipamentos?select=id&limit=1" -H "apikey: $SB_PUB" -o /dev/null
+        run: |
+          curl -fsS "$SB_URL/rest/v1/equipamentos?select=id&limit=1" -H "apikey: $SB_PUB" -o /dev/null
       - uses: actions/checkout@v4
       - name: Cópia semanal dos registros
         env:
