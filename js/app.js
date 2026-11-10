@@ -911,9 +911,8 @@ function telaLogin(modo = 'entrar', msg = '') {
         <li>${ic('bell')}Aviso no celular e no computador do que vence no mês seguinte</li>
         <li>${ic('pencil')}Justificativa obrigatória para testes fora do prazo</li>
       </ul>
-      <img class="login-marca" src="icons/marca.png" alt="Marca da equipe" hidden onload="this.hidden=false" onerror="this.remove()">
-      <div class="login-equipe">As Meninas Superradioativas</div>
-      <h1>Controle de qualidade, sempre em dia.</h1>
+      <h1 class="login-equipe"><span>As Meninas</span> <b>Superradioativas</b></h1>
+      <div class="login-marca-box" hidden><img class="login-marca" src="icons/marca.png" alt="Marca da equipe" onload="this.parentNode.hidden=false" onerror="this.parentNode.remove()"></div>
       <p>Testes dos equipamentos de Medicina Nuclear conforme a ${NORMA}.</p>
     </section>
     <section class="login-panel"><div class="login-card fade-in">
