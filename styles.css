@@ -576,9 +576,17 @@ body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none
 .login-equipe span { display: inline-block; font-size: .5em; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #1B1464; background: #FFE94A; padding: .18em .7em .14em; border-radius: 999px; margin: 0 0 .3em .15em; box-shadow: 0 3px 0 #1B1464; }
 .login-equipe b { display: block; font-weight: 700; color: #FF3D9A; -webkit-text-stroke: .2em #fff; paint-order: stroke fill; text-shadow: 0 .09em 0 #1B1464, 0 .16em .3em rgba(27, 20, 100, .45); padding: .06em .12em .12em; margin-left: -.02em; }
 /* imagem da equipe (icons/marca.png): o branco do fundo se desfaz num brilho oval */
-.login-marca-box { position: relative; z-index: 1; align-self: flex-start; width: min(100%, 340px); margin: 14px 0 6px; padding: 14px 22px; background: radial-gradient(closest-side, #fff 0%, #fff 62%, rgba(255,255,255,.6) 80%, rgba(255,255,255,0) 100%); }
-.login-marca { display: block; width: 100%; height: auto; mix-blend-mode: multiply; -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
+.login-marca-box { position: relative; z-index: 1; align-self: stretch; margin: 18px -28px 0; padding: 6px 28px; background: #fff; }
+.login-marca-box::before, .login-marca-box::after { content: ''; position: absolute; left: 0; right: 0; height: 130px; pointer-events: none; }
+.login-marca-box::before { bottom: 100%; background: linear-gradient(to top, #fff 0%, rgba(255,255,255,.75) 30%, rgba(255,255,255,0) 100%); z-index: -1; }
+.login-marca-box::after { top: 100%; background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,.75) 30%, rgba(255,255,255,0) 100%); }
+.login-marca { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; }
 .login-hero p { margin-top: 10px; }
-@media (min-width: 900px) { .login-hero h1.login-equipe { font-size: 62px; margin-top: auto; } .login-marca-box { width: min(100%, 440px); } }
+@media (min-width: 900px) { .login-hero h1.login-equipe { font-size: 62px; margin-top: auto; } .login-marca-box { margin: 18px -64px 0; padding: 6px 64px; } .login-marca { width: min(100%, 460px); margin: 0; } }
 @font-face { font-family: 'Fredoka'; font-weight: 600; font-display: swap; src: url('fonts/fredoka-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Fredoka'; font-weight: 700; font-display: swap; src: url('fonts/fredoka-latin-700-normal.woff2') format('woff2'); }
+/* painel de entrada: azul em cima, branco na faixa da imagem, rosa embaixo */
+.login-hero { background: linear-gradient(180deg, #1F7FE0 0%, #3FA9F0 34%, #8FD0FA 50%, #FFB3D6 62%, #F45FA6 82%, #E23D86 100%); }
+.login-hero::after { display: none; }
+.login-hero h1.login-equipe { position: relative; z-index: 2; }
+.login-hero p { position: relative; z-index: 2; margin-top: 26px; color: #5A0F3C; font-weight: 600; opacity: 1; text-shadow: none; }
