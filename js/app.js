@@ -179,7 +179,7 @@ function telaInicio() {
       </div>
       <div class="hero-stats duo">
         <button class="hstat big" data-go="#atrasados"><span class="hdot red"></span><b>${c.atrasado.length}</b><span>Teste${c.atrasado.length === 1 ? '' : 's'} em atraso</span></button>
-        <button class="hstat big" data-go="#proximo-mes"><span class="hdot sky"></span><b>${c.proximo.length}</b><span>Vence${c.proximo.length === 1 ? '' : 'm'} em ${nomeMes(1)}</span></button>
+        <button class="hstat big" data-go="#este-mes"><span class="hdot sky"></span><b>${c.mes.length}</b><span>Vence${c.mes.length === 1 ? '' : 'm'} em ${nomeMes(0)}</span></button>
       </div>
     </section>
     ${!notifOn && 'Notification' in window ? `
@@ -187,9 +187,9 @@ function telaInicio() {
     <div class="dash">
       <div class="dash-main">
         <section class="section" id="atrasados"><div class="section-head"><h2 class="section-title"><span class="sdot red"></span>Em atraso</h2><span class="section-sub">Registro exige justificativa</span></div>${lista(c.atrasado, 'Nenhum teste atrasado.')}</section>
-        <section class="section" id="proximo-mes"><div class="section-head"><h2 class="section-title"><span class="sdot sky"></span>Vencem em ${nomeMes(1)}</h2><span class="section-sub">Programe-se</span></div>${lista(c.proximo, 'Nada vence no próximo mês.')}</section>
-        ${c.mes.length || c.sem.length ? `<div class="group quiet">
-          ${c.mes.length ? `<a class="cell" href="#quadro"><div class="cell-ico" style="background:var(--amber-tint);color:var(--amber)">${ic('clock')}</div><div class="cell-body"><div class="cell-title">${c.mes.length} teste${c.mes.length > 1 ? 's' : ''} ainda vence${c.mes.length > 1 ? 'm' : ''} em ${nomeMes(0)}</div><div class="cell-sub">Veja no quadro</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
+        <section class="section" id="este-mes"><div class="section-head"><h2 class="section-title"><span class="sdot sky"></span>Vencem em ${nomeMes(0)}</h2><span class="section-sub">Fazer até o fim do mês</span></div>${lista(c.mes, 'Nada mais vence neste mês.')}</section>
+        ${c.proximo.length || c.sem.length ? `<div class="group quiet">
+          ${c.proximo.length ? `<a class="cell" href="#agenda"><div class="cell-ico" style="background:var(--amber-tint);color:var(--amber)">${ic('calendar')}</div><div class="cell-body"><div class="cell-title">${c.proximo.length} teste${c.proximo.length > 1 ? 's' : ''} vence${c.proximo.length > 1 ? 'm' : ''} em ${nomeMes(1)}</div><div class="cell-sub">Veja na agenda</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
           ${c.sem.length ? `<a class="cell" href="#equipamentos"><div class="cell-ico" style="background:var(--fill);color:var(--label-2)">${ic('list')}</div><div class="cell-body"><div class="cell-title">${c.sem.length} testes ainda sem registro</div><div class="cell-sub">Registre a última execução para começar a contar o vencimento</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
         </div>` : ''}
       </div>
