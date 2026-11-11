@@ -590,3 +590,6 @@ body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none
 .login-hero::after { display: none; }
 .login-hero h1.login-equipe { position: relative; z-index: 2; }
 .login-hero p { position: relative; z-index: 2; margin-top: 26px; color: #5A0F3C; font-weight: 600; opacity: 1; text-shadow: none; }
+/* aviso de versão nova */
+.atualiza { position: fixed; z-index: 120; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--royal); color: #fff; font-weight: 600; font-size: 14px; box-shadow: var(--shadow-3); width: max-content; max-width: calc(100vw - 24px); }
+@media (min-width: 900px) { .atualiza { bottom: 28px; } }

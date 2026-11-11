@@ -188,8 +188,7 @@ function telaInicio() {
       <div class="dash-main">
         <section class="section" id="atrasados"><div class="section-head"><h2 class="section-title"><span class="sdot red"></span>Em atraso</h2><span class="section-sub">Registro exige justificativa</span></div>${lista(c.atrasado, 'Nenhum teste atrasado.')}</section>
         <section class="section" id="este-mes"><div class="section-head"><h2 class="section-title"><span class="sdot sky"></span>Vencem em ${nomeMes(0)}</h2><span class="section-sub">Fazer até o fim do mês</span></div>${lista(c.mes, 'Nada mais vence neste mês.')}</section>
-        ${c.proximo.length || c.sem.length ? `<div class="group quiet">
-          ${c.proximo.length ? `<a class="cell" href="#agenda"><div class="cell-ico" style="background:var(--amber-tint);color:var(--amber)">${ic('calendar')}</div><div class="cell-body"><div class="cell-title">${c.proximo.length} teste${c.proximo.length > 1 ? 's' : ''} vence${c.proximo.length > 1 ? 'm' : ''} em ${nomeMes(1)}</div><div class="cell-sub">Veja na agenda</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
+        ${c.sem.length ? `<div class="group quiet">
           ${c.sem.length ? `<a class="cell" href="#equipamentos"><div class="cell-ico" style="background:var(--fill);color:var(--label-2)">${ic('list')}</div><div class="cell-body"><div class="cell-title">${c.sem.length} testes ainda sem registro</div><div class="cell-sub">Registre a última execução para começar a contar o vencimento</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
         </div>` : ''}
       </div>
@@ -357,7 +356,7 @@ function telaEquipamentos() {
         </div>
         <div class="eq-nums">
           <div><b class="${st.a ? 'red' : ''}">${st.a}</b><span>Atrasados</span></div>
-          <div><b class="${st.m + st.p ? 'amber' : ''}">${st.m + st.p}</b><span>Até ${nomeMes(1).slice(0, 3)}</span></div>
+          <div><b class="${st.m ? 'amber' : ''}">${st.m}</b><span>Em ${nomeMes(0).slice(0, 3)}</span></div>
           <div><b>${st.ok}</b><span>Em dia</span></div>
         </div>
         <div class="eq-foot">${st.prox ? `${ic('calendar')}<span>Próximo: <b>${esc(st.prox.nome)}</b> · ${fmtVenc(S.sit.get(st.prox.id).venc, st.prox.per)}</span>`
@@ -390,7 +389,7 @@ function telaEquip(id) {
       </div>
       <div class="hero-stats">
         <div class="hstat"><span class="hdot red"></span><b>${st.a}</b><span>Atrasados</span></div>
-        <div class="hstat"><span class="hdot amber"></span><b>${st.m + st.p}</b><span>Até ${nomeMes(1)}</span></div>
+        <div class="hstat"><span class="hdot amber"></span><b>${st.m}</b><span>Vence${st.m === 1 ? '' : 'm'} em ${nomeMes(0)}</span></div>
         <div class="hstat"><span class="hdot green"></span><b>${st.ok}</b><span>Em dia</span></div>
       </div>
     </section>
@@ -483,6 +482,10 @@ function telaAjustes() {
         </div>
         <p class="note">Você recebe um aviso no início de cada mês com os testes que vencem no mês seguinte, e lembretes quando um teste atrasa.${ios ? ' No iPhone, toque em Compartilhar e "Adicionar à Tela de Início" para instalar o app e liberar os avisos.' : ''}</p>
       </section>
+      <section class="section"><div class="section-head"><h2 class="section-title">Atualização</h2><span class="section-sub">O app se atualiza sozinho ao ser aberto</span></div>
+        <div class="group">
+          <button class="cell" data-acao="atualizar"><div class="cell-ico" style="background:var(--royal-tint);color:var(--royal)">${ic('download')}</div><div class="cell-body"><div class="cell-title">Atualizar agora</div><div class="cell-sub">Baixa a versão mais recente do app e os dados do banco. Seus registros não são afetados.</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></button>
+        </div></section>
       <section class="section"><div class="section-head"><h2 class="section-title">Sobre</h2></div>
         <div class="group">
           <div class="cell"><div class="cell-ico">${ic('shield')}</div><div class="cell-body"><div class="cell-title">Norma de referência</div><div class="cell-sub">${NORMA}. Anexos II (gama câmara), III (sondas), IV (PET/CT) e V (ativímetro); Arts. 20 e 26 (monitores).</div></div></div>
@@ -521,6 +524,7 @@ document.addEventListener('click', async ev => {
   if (el.dataset.filtroHist) { S.filtroHist = el.dataset.filtroHist; return render(); }
   const a = el.dataset.acao;
   if (a === 'notif') return ativarNotificacoes();
+  if (a === 'atualizar') { toast('Buscando a versão mais recente…'); return setTimeout(aplicarAtualizacao, 500); }
   if (a === 'testar-notif') return notificar('Controle de CQ', 'Os avisos estão funcionando neste aparelho.');
   if (a === 'sair') { await store.sair(); S.user = null; return telaLogin(); }
   if (a === 'csv') return exportarCSV();
@@ -815,6 +819,43 @@ function abrirAutorizar() {
 
 // ---------------- notificações ----------------
 let swReg = null;
+// ---------- atualização do app ----------
+// Compara a "assinatura" dos arquivos publicados com a que estava no ar quando o app abriu.
+const ARQ_VERSAO = ['index.html', 'styles.css', 'config.js', 'sw.js', 'js/app.js', 'js/store.js', 'js/regras.js', 'js/catalogo.js', 'js/icones.js'];
+let versaoAberta = null, conferidoEm = 0, atualizando = false;
+async function assinatura() {
+  try {
+    const rs = await Promise.all(ARQ_VERSAO.map(f => fetch(f, { method: 'HEAD', cache: 'no-store' })));
+    if (rs.some(r => !r.ok)) return null;
+    const partes = rs.map(r => r.headers.get('etag') || r.headers.get('last-modified') || r.headers.get('content-length') || '');
+    return partes.every(Boolean) ? partes.join('|') : null;
+  } catch { return null; }
+}
+async function aplicarAtualizacao() {
+  if (atualizando) return; atualizando = true;
+  try { await swReg?.update(); } catch {}
+  try { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } catch {}
+  location.reload();
+}
+function avisoAtualizacao() {
+  if (document.getElementById('atualiza')) return;
+  const d = document.createElement('div'); d.id = 'atualiza'; d.className = 'atualiza';
+  d.innerHTML = `<span>Há uma versão nova do app.</span><button class="btn btn-white btn-sm">Atualizar</button>`;
+  d.querySelector('button').onclick = aplicarAtualizacao; document.body.appendChild(d);
+}
+async function conferirVersao(manual) {
+  if (!manual && Date.now() - conferidoEm < 60000) return;
+  conferidoEm = Date.now();
+  const v = await assinatura();
+  if (!v) { if (manual) toast('Sem conexão para conferir. Tente de novo.', 'alert'); return; }
+  if (!versaoAberta) { versaoAberta = v; if (manual) toast('Você já está na versão mais recente'); return; }
+  if (v === versaoAberta) { if (manual) toast('Você já está na versão mais recente'); return; }
+  // não interrompe quem está no meio de um registro
+  if (!manual && document.querySelector('#sheet-root .sheet')) return avisoAtualizacao();
+  if (manual) toast('Atualizando…');
+  aplicarAtualizacao();
+}
+
 async function registrarSW() {
   if (!('serviceWorker' in navigator)) return;
   try { swReg = await navigator.serviceWorker.register('sw.js'); } catch {}
@@ -968,5 +1009,17 @@ async function iniciarApp() {
     $app.innerHTML = `<div class="boot"><div class="login-card" style="max-width:420px;margin:16px"><h2>Não foi possível abrir</h2><p class="sub">${esc(e.message)}</p><button class="btn btn-primary btn-block" onclick="location.reload()">Tentar de novo</button></div></div>`;
   }
   // recalcula ao virar o dia / voltar ao app
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && S.user) { indexar(); render(); avisosLocais(); } });
+  let recarregadoEm = Date.now();
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden) return;
+    conferirVersao();
+    if (!S.user) return;
+    // ao voltar para o app, busca os dados de novo (no máximo uma vez por minuto) sem atrapalhar um formulário aberto
+    if (Date.now() - recarregadoEm > 60000 && !document.querySelector('#sheet-root .sheet')) { recarregadoEm = Date.now(); try { await carregar(); } catch {} }
+    else indexar();
+    if (!document.querySelector('#sheet-root .sheet')) render();
+    avisosLocais();
+  });
+  conferirVersao();
+  setInterval(() => { if (!document.hidden) conferirVersao(); }, 30 * 60000);
 })();
