@@ -30,6 +30,7 @@ Os testes vencem no **mês** em que completam a periodicidade (como na planilha 
 - `supabase/cron.sql` — agenda a função todo dia às 8h (Brasília).
 
 ## Situação (10/11/2026)
+- Endereços: https://dwkcqhcfmb.pages.dev (Cloudflare Pages, ligado a este repositório, branch `main`) e https://wallifer04.github.io/controle-cq/ (GitHub Pages). Cada envio para a `main` publica nos dois.
 - Banco na nuvem: projeto Supabase `controle-cq-medicina-nuclear` (ref `mgvtfpwercpypspaaaod`, São Paulo), com tabelas, 74 testes e o histórico da planilha.
 - Função `notificar` publicada e agendada todo dia às 8h. As chaves do push ficam na tabela `config_privada` (só o servidor lê); nenhum segredo fica neste repositório.
 - `config.js` já aponta para o banco (a chave que está ali é a pública).
