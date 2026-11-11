@@ -16,7 +16,7 @@ const S = { user: null, eqs: [], testes: [], regs: [], porTeste: new Map(), sit:
 // ---------------- dados ----------------
 async function carregar() {
   const d = await store.carregar();
-  S.eqs = d.equipamentos; S.todos = d.testes; S.testes = d.testes.filter(t => t.ativo !== false); S.regs = d.registros;
+  S.eqs = d.equipamentos; S.todos = d.testes; S.testes = d.testes.filter(t => t.ativo !== false); S.regsTodos = d.registros; S.regs = d.registros.filter(r => !r.anulado_em); // desfeitos ficam só no histórico
   indexar();
 }
 function indexar() {
@@ -247,7 +247,7 @@ function telaQuadro() {
       ${col('var(--royal)', 'Relatório realizado', `Assinatura em até ${PRAZO_ETAPA} dias úteis`, e2, 'etapa', 'Nenhum relatório aguardando assinatura.', 2)}
       ${col('var(--green)', 'Relatório assinado', 'Concluídos recentemente', feitos, 'feito', 'Os testes concluídos aparecem aqui.', 3)}
     </div>
-    <p class="note">Arraste o cartão para a coluna seguinte para avançar a etapa (no celular, segure o cartão por um instante e arraste), ou toque nele para ver os detalhes. O prazo conta em dias úteis e pula sábados, domingos e feriados nacionais.</p>`;
+    <p class="note">Arraste o cartão para a coluna seguinte para avançar a etapa, ou para uma coluna anterior para desfazer (no celular, segure o cartão por um instante e arraste). Toque no cartão para ver os detalhes. O prazo conta em dias úteis e pula sábados, domingos e feriados (nacionais, 9 de julho e Dia do Servidor Público).</p>`;
 }
 
 // ---------- arrastar no quadro ----------
@@ -256,8 +256,14 @@ let arrasto = null, ignorarClique = false;
 function soltarNoQuadro(id, de, para) {
   const t = testeDe(id); if (!t) return;
   if (para === de) return;
-  if (para < de) return toast('Os registros não podem ser desfeitos. Só dá para avançar a etapa.', 'alert');
   const regs = S.porTeste.get(id) || [], hoje = hojeISO(), et = etapas(t), s = S.sit.get(id);
+  if (para < de) {
+    // voltar coluna = desfazer as etapas, da última para a primeira, com motivo
+    const lista = et.importado ? (para === 0 ? [s.ultima] : []) : [de >= 3 ? et.concluido : null, de >= 2 && para <= 1 ? et.relatorio : null, para === 0 ? s.ultima : null].filter(Boolean);
+    if (!lista.length) return toast('Este registro veio da planilha e não tem etapas para desfazer.', 'alert');
+    if (!lista.every(podeDesfazer)) return toast('Só quem registrou ou o administrador pode desfazer.', 'alert');
+    return abrirDesfazer(t, lista);
+  }
   if (de === 0) {
     // novo teste: se está fora do prazo, precisa da justificativa no formulário
     if (exigeJustificativa(t, regs, hoje)) { toast('Teste fora do prazo: escreva a justificativa para registrar.', 'alert'); return abrirRegistro(id, para); }
@@ -297,9 +303,9 @@ function iniciarArrasto(card, x, y) {
 function moverArrasto(x, y) {
   const a = arrasto; a.ghost.style.left = (x - a.dx) + 'px'; a.ghost.style.top = (y - a.dy) + 'px';
   const col = [...document.querySelectorAll('[data-kcol]')].find(c => { const r = c.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top - 40 && y <= r.bottom + 40; }) || null;
-  document.querySelectorAll('.kcol.alvo, .kcol.nao').forEach(c => c.classList.remove('alvo', 'nao'));
+  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'nao'));
   a.alvo = col ? +col.dataset.kcol : null;
-  if (col && a.alvo !== a.de) col.classList.add(a.alvo > a.de ? 'alvo' : 'nao');
+  if (col && a.alvo !== a.de) col.classList.add(a.alvo > a.de ? 'alvo' : 'volta');
   // rola o quadro quando chega perto das bordas (celular)
   const k = document.querySelector('.kanban'); if (k) { const kr = k.getBoundingClientRect(); if (x > kr.right - 48) k.scrollLeft += 14; else if (x < kr.left + 48) k.scrollLeft -= 14; }
   if (y > innerHeight - 110) scrollBy(0, 12); else if (y < 90) scrollBy(0, -12);
@@ -309,7 +315,7 @@ function fimArrasto(soltar) {
   clearTimeout(a.timer);
   if (!a.ativo) return;
   a.ghost.remove(); a.card.classList.remove('arrastando'); document.body.classList.remove('em-arrasto');
-  document.querySelectorAll('.kcol.alvo, .kcol.nao').forEach(c => c.classList.remove('alvo', 'nao'));
+  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'nao'));
   ignorarClique = true; setTimeout(() => { ignorarClique = false; }, 350);
   if (soltar && a.alvo != null) soltarNoQuadro(a.id, a.de, a.alvo);
 }
@@ -429,12 +435,13 @@ const rotuloReg = r => r.tipo === 'justificativa' ? 'Justificativa' : r.tipo ===
 function telaHistorico() {
   const q = S.busca.trim().toLowerCase();
   const f = S.filtroHist;
-  const regs = [...S.regs].sort((a, b) => b.data.localeCompare(a.data) || (b.created_at || '').localeCompare(a.created_at || '')).filter(r => {
+  const regs = [...S.regsTodos].sort((a, b) => b.data.localeCompare(a.data) || (b.created_at || '').localeCompare(a.created_at || '')).filter(r => {
     const t = testeDe(r.teste_id); if (!t) return false;
+    if (f === 'desfeitos') return !!r.anulado_em;
     if (f === 'atrasados' && !r.atrasado && r.tipo !== 'justificativa') return false;
     if (f === 'nc' && r.resultado !== 'nao_conforme') return false;
     if (!q) return true;
-    return [t.nome, eqDe(t.eq)?.nome, r.usuario_nome, r.observacao, r.justificativa].join(' ').toLowerCase().includes(q);
+    return [t.nome, eqDe(t.eq)?.nome, r.usuario_nome, r.observacao, r.justificativa, r.anulado_motivo].join(' ').toLowerCase().includes(q);
   });
   const vis = regs.slice(0, 300);
   return `
@@ -446,6 +453,7 @@ function telaHistorico() {
         <button data-filtro-hist="todos" aria-pressed="${f === 'todos'}">Todos</button>
         <button data-filtro-hist="atrasados" aria-pressed="${f === 'atrasados'}">Com justificativa</button>
         <button data-filtro-hist="nc" aria-pressed="${f === 'nc'}">Não conformes</button>
+        <button data-filtro-hist="desfeitos" aria-pressed="${f === 'desfeitos'}">Desfeitos</button>
       </div>
     </div>
     <div class="group" id="hist-lista">${vis.length ? vis.map(r => {
@@ -455,10 +463,10 @@ function telaHistorico() {
         : r.resultado === 'nao_conforme' ? `<div class="cell-ico" style="background:var(--red-tint);color:var(--red)">${ic('xCircle')}</div>`
         : r.tipo !== 'execucao' ? `<div class="cell-ico">${ic(r.tipo === 'concluido' ? 'shield' : 'doc')}</div>`
         : `<div class="cell-ico" style="background:var(--green-tint);color:var(--green)">${ic('check')}</div>`;
-      const extra = r.justificativa || r.observacao;
-      return `<button class="cell" data-teste="${esc(t.id)}">${ico}<div class="cell-body"><div class="cell-title">${esc(t.nome)}</div>
+      const extra = r.anulado_em ? `Desfeito por ${r.anulado_por || ''} em ${fmtData(r.anulado_em.slice(0, 10))}: ${r.anulado_motivo || ''}` : (r.justificativa || r.observacao);
+      return `<button class="cell ${r.anulado_em ? 'desfeito' : ''}" data-teste="${esc(t.id)}">${ico}<div class="cell-body"><div class="cell-title">${esc(t.nome)}</div>
         <div class="cell-sub">${rotuloReg(r)} · ${esc(e?.nome)} · ${esc(r.usuario_nome || '')}${extra ? ' · ' + esc(extra.slice(0, 90)) : ''}</div></div>
-        <div class="cell-trail"><span class="small">${fmtData(r.data)}</span>${r.atrasado && !just ? '<span class="tag">Com atraso</span>' : ''}</div></button>`;
+        <div class="cell-trail"><span class="small">${fmtData(r.data)}</span>${r.anulado_em ? '<span class="tag">Desfeito</span>' : r.atrasado && !just ? '<span class="tag">Com atraso</span>' : ''}</div></button>`;
     }).join('') : `<div class="empty">Nenhum registro encontrado.</div>`}</div>
     ${regs.length > vis.length ? `<p class="note">Mostrando os 300 mais recentes. Use a busca ou exporte a planilha para ver tudo.</p>` : ''}`;
 }
@@ -562,7 +570,7 @@ function abrirSheet({ titulo, corpo, acao, aoAbrir }) {
 function abrirTeste(id) {
   const t = testeDe(id); if (!t) return;
   const e = eqDe(t.eq), s = S.sit.get(id);
-  const regs = [...(S.porTeste.get(id) || [])].sort((a, b) => b.data.localeCompare(a.data) || (b.created_at || '').localeCompare(a.created_at || ''));
+  const regs = S.regsTodos.filter(r => r.teste_id === id).sort((a, b) => b.data.localeCompare(a.data) || (b.created_at || '').localeCompare(a.created_at || ''));
   const rotina = ehRotina(t.per), et = etapas(t);
   const corpo = `
     <div class="sheet-hero"><div class="eq-ico">${ic(e.icone)}</div><h2>${esc(t.nome)}</h2><p>${esc(e.nome)} · ${esc(t.anexo || '')}</p><div style="margin-top:10px">${pill(t)}</div></div>
@@ -580,8 +588,8 @@ function abrirTeste(id) {
     ${S.user.admin ? `<button class="btn btn-plain btn-block" style="margin-top:4px" data-editar>${ic('pencil')}Editar ou excluir teste</button>` : ''}
     <div class="section" style="margin-top:22px"><div class="section-head"><h2 class="section-title" style="font-size:18px">Histórico</h2><span class="section-sub">${regs.length} registro${regs.length === 1 ? '' : 's'}</span></div>
       ${regs.length ? `<div class="group" style="padding:14px 14px 2px"><ul class="timeline">${regs.slice(0, 40).map(r => `
-        <li class="${r.tipo === 'justificativa' ? 'j' : r.resultado === 'nao_conforme' ? 'n' : r.tipo !== 'execucao' ? 'r' : ''}"><b>${fmtData(r.data)} · ${rotuloReg(r)}</b>
-        <p>${esc(r.usuario_nome || '')}${r.atrasado ? ' · com atraso' : ''}</p>
+        <li class="${r.tipo === 'justificativa' ? 'j' : r.resultado === 'nao_conforme' ? 'n' : r.tipo !== 'execucao' ? 'r' : ''}"><b ${r.anulado_em ? 'style="text-decoration:line-through;opacity:.6"' : ''}>${fmtData(r.data)} · ${rotuloReg(r)}</b>
+        <p>${esc(r.usuario_nome || '')}${r.atrasado ? ' · com atraso' : ''}</p>${r.anulado_em ? `<p><b style="font-size:13px">Desfeito por ${esc(r.anulado_por || '')} em ${fmtData(r.anulado_em.slice(0, 10))}:</b> ${esc(r.anulado_motivo || '')}</p>` : ''}
         ${r.justificativa ? `<p><b style="font-size:13px">Justificativa:</b> ${esc(r.justificativa)}</p>` : ''}${r.observacao ? `<p>${esc(r.observacao)}</p>` : ''}</li>`).join('')}</ul></div>`
       : `<div class="group"><div class="empty">Nenhum registro ainda.</div></div>`}
     </div>`;
@@ -599,6 +607,7 @@ function abrirTeste(id) {
       b.disabled = true;
       salvar(null).then(() => setTimeout(() => abrirTeste(id), 250)).catch(e2 => toast(e2.message));
     });
+    sh.querySelector('[data-desfazer]')?.addEventListener('click', () => { const r = ultimoReg(t); fechar(); setTimeout(() => abrirDesfazer(t, [r], () => setTimeout(() => abrirTeste(id), 250)), 220); });
     sh.querySelector('[data-justificar]')?.addEventListener('click', () => { fechar(); setTimeout(() => abrirJustificativa(id), 200); });
     sh.querySelector('[data-editar]')?.addEventListener('click', () => { fechar(); setTimeout(() => abrirEditar(id), 200); });
   } });
@@ -618,6 +627,25 @@ function abrirJustEtapa(t, et, tipo, salvar) {
       try { await salvar(j); fechar(); } catch (e2) { sh.querySelector('#erro').textContent = e2.message; } }; } });
 }
 
+// ---------- desfazer registros (ficam no histórico, marcados como desfeitos) ----------
+const NOME_ETAPA = { execucao: 'teste realizado', relatorio: 'relatório realizado', concluido: 'relatório assinado' };
+function ultimoReg(t) { const s = S.sit.get(t.id), et = etapas(t); if (!s?.ultima) return null; return et.importado ? s.ultima : et.concluido || et.relatorio || s.ultima; }
+const podeDesfazer = r => !!r && (S.user.admin || (r.usuario_id && r.usuario_id === S.user.id));
+function abrirDesfazer(t, regs, depois) {
+  const lista = regs.map(r => NOME_ETAPA[r.tipo]).join(', ');
+  abrirSheet({ titulo: 'Desfazer', corpo: `
+    <div class="sheet-hero" style="padding-bottom:12px"><div class="eq-ico" style="${grad(t.eq)}">${ic(eqDe(t.eq).icone)}</div><h2>${esc(t.nome)}</h2><p>${esc(eqDe(t.eq).nome)}</p></div>
+    <div class="alert red">${ic('alert')}<div><b>Desfazer ${lista}</b>O registro não é apagado: fica no histórico como desfeito, com seu nome, a data e o motivo.</div></div>
+    <form id="f-desf"><label class="field"><span>Motivo (obrigatório)</span><textarea class="input" name="motivo" placeholder="Ex.: marquei a etapa por engano; o relatório ainda não foi feito."></textarea></label>
+    <div class="form-err" id="erro"></div><button class="btn btn-danger btn-block">Desfazer</button></form>`,
+  aoAbrir: (sh, fechar) => { const f = sh.querySelector('#f-desf'); f.motivo.focus();
+    f.onsubmit = async ev => { ev.preventDefault(); const m = f.motivo.value.trim(), erro = sh.querySelector('#erro');
+      if (m.length < 10) { f.motivo.classList.add('err'); erro.textContent = 'Escreva o motivo (pelo menos 10 caracteres).'; return; }
+      const b = f.querySelector('button'); b.disabled = true;
+      try { for (const r of regs) await store.anularRegistro(r.id, m); await carregar(); render(); fechar(); toast('Desfeito. O registro ficou no histórico.'); depois?.(); }
+      catch (e2) { b.disabled = false; erro.textContent = e2.message; try { await carregar(); render(); } catch {} } }; } });
+}
+
 function stepper(t) {
   const s = S.sit.get(t.id), et = etapas(t);
   if (!s.ultima) return `<div class="steps"><div class="steps-head"><b>Etapas</b><span>0 de 3</span></div>${ETAPAS.map((e, i) => `<div class="step"><span class="step-n">${i + 1}</span><div class="step-b"><b>${e.nome}</b><span>Pendente</span></div></div>`).join('')}</div>`;
@@ -628,7 +656,8 @@ function stepper(t) {
   return `<div class="steps"><div class="steps-head"><b>Etapas do teste de ${fmtMes(s.ultima.data)}</b><span>${et.n} de 3</span></div>
     ${ETAPAS.map((e, i) => `<div class="step ${i < et.n ? 'done' : i === et.n ? 'next' : ''}"><span class="step-n">${i < et.n ? ic('check', '') : i + 1}</span>
       <div class="step-b"><b>${e.nome}</b><span>${i < et.n ? info[i] : i === et.n ? (et.atrasada ? `<b class="tarde">Atrasado. O prazo era ${fmtData(et.prazo)}</b>` : `Prazo: até ${fmtData(et.prazo)}`) : `Até ${PRAZO_ETAPA} dias úteis depois do relatório`}</span></div>${acao(i)}</div>`).join('')}
-    ${et.n === 1 && !et.atrasada ? `<button class="btn btn-plain btn-sm steps-all" data-etapa="ambos">Marcar relatório realizado e assinado de uma vez</button>` : ''}</div>`;
+    ${et.n === 1 && !et.atrasada ? `<button class="btn btn-plain btn-sm steps-all" data-etapa="ambos">Marcar relatório realizado e assinado de uma vez</button>` : ''}
+    ${podeDesfazer(ultimoReg(t)) ? `<button class="btn btn-plain btn-sm steps-all" style="color:var(--red)" data-desfazer>Desfazer: ${NOME_ETAPA[ultimoReg(t).tipo]}</button>` : ''}</div>`;
 }
 
 function abrirRegistro(id, colAlvo = 1) {
@@ -670,7 +699,6 @@ function abrirRegistro(id, colAlvo = 1) {
     const on = b => b.getAttribute('aria-checked') === 'true', set = (b, v) => b.setAttribute('aria-checked', v);
     bRel.onclick = () => { set(bRel, !on(bRel)); if (!on(bRel)) set(bCon, false); };
     bCon.onclick = () => { set(bCon, !on(bCon)); if (on(bCon)) set(bRel, true); };
-    if (colAlvo >= 2) set(bRel, true); if (colAlvo >= 3) set(bCon, true);
     f.data.addEventListener('input', atualizar);
     sh.querySelectorAll('[data-res]').forEach(b => b.onclick = () => { res = b.dataset.res; sh.querySelectorAll('[data-res]').forEach(x => x.setAttribute('aria-pressed', x === b)); atualizar(); });
     atualizar();
@@ -926,9 +954,9 @@ function avisosLocais(forcar = false) {
 
 // ---------------- exportar ----------------
 function exportarCSV() {
-  const linhas = [['Data', 'Equipamento', 'Teste', 'Periodicidade', 'Tipo', 'Resultado', 'Com atraso', 'Justificativa', 'Observação', 'Responsável']];
-  [...S.regs].sort((a, b) => b.data.localeCompare(a.data)).forEach(r => { const t = testeDe(r.teste_id); if (!t) return;
-    linhas.push([fmtData(r.data), eqDe(t.eq).nome, t.nome, nomePer(t.per), rotuloReg(r).split(' · ')[0], r.resultado === 'nao_conforme' ? 'Não conforme' : r.resultado ? 'Conforme' : '', r.atrasado ? 'Sim' : 'Não', r.justificativa || '', r.observacao || '', r.usuario_nome || '']); });
+  const linhas = [['Data', 'Equipamento', 'Teste', 'Periodicidade', 'Tipo', 'Resultado', 'Com atraso', 'Justificativa', 'Observação', 'Responsável', 'Desfeito em', 'Desfeito por', 'Motivo']];
+  [...S.regsTodos].sort((a, b) => b.data.localeCompare(a.data)).forEach(r => { const t = testeDe(r.teste_id); if (!t) return;
+    linhas.push([fmtData(r.data), eqDe(t.eq).nome, t.nome, nomePer(t.per), rotuloReg(r).split(' · ')[0], r.resultado === 'nao_conforme' ? 'Não conforme' : r.resultado ? 'Conforme' : '', r.atrasado ? 'Sim' : 'Não', r.justificativa || '', r.observacao || '', r.usuario_nome || '', r.anulado_em ? fmtData(r.anulado_em.slice(0, 10)) : '', r.anulado_por || '', r.anulado_motivo || '']); });
   const csv = '﻿' + linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\r\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   a.download = `historico-cq-${hojeISO()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);

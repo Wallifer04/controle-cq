@@ -31,7 +31,7 @@ function pascoa(y: number): Date {
   const mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
   return new Date(Date.UTC(y, mes - 1, dia));
 }
-const FIXOS = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '11-20', '12-25'];
+const FIXOS = ['01-01', '04-21', '05-01', '07-09', '09-07', '10-12', '10-28', '11-02', '11-15', '11-20', '12-25'];
 function diaUtil(d: Date): boolean {
   const w = d.getUTCDay(); if (w === 0 || w === 6) return false;
   if (FIXOS.includes(isoD(d).slice(5))) return false;

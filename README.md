@@ -10,7 +10,7 @@ e acompanhar os vencimentos conforme a **Norma CNEN/ANSN 3.05** (Resolução CNE
 - Resultado "Não conforme" exige descrição.
 - Painel com atrasados, o que vence no mês e no mês seguinte; agenda dos próximos 12 meses; histórico com busca e exportação em planilha (CSV).
 - Cada teste tem 3 etapas: teste realizado, relatório realizado e relatório assinado. O vencimento conta a partir do teste realizado.
-- Prazos das etapas: 2 dias úteis após o teste para o relatório e 2 dias úteis após o relatório para a assinatura (pula fins de semana e feriados nacionais). Etapa marcada fora do prazo exige justificativa.
+- Prazos das etapas: 2 dias úteis após o teste para o relatório e 2 dias úteis após o relatório para a assinatura (pula fins de semana, feriados nacionais, 9 de julho (SP) e 28 de outubro (Dia do Servidor Público)). Etapa marcada fora do prazo exige justificativa.
 - Quadro no estilo Trello com as colunas A fazer, Teste realizado, Relatório realizado e Relatório assinado.
 - No quadro, dá para arrastar o cartão para a coluna seguinte (no celular, segurar e arrastar). Voltar etapa é bloqueado.
 - Testes diários e semanais ficam fora do controle, por decisão do setor.

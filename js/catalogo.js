@@ -37,7 +37,7 @@ function gama(id, comCT) {
     t('sens-i', 'Sensibilidade planar – Iodo', S),
     t('sens-tl', 'Sensibilidade planar – Tálio', S),
     t('taxa', 'Taxa máxima de contagem', S),
-    t('tempo-morto', 'Tempo morto', S, { anexo: 'Rotina do setor', nota: 'Não aparece com esse nome na norma; mantido da planilha do setor.' }),
+    t('tempo-morto', 'Tempo morto', S, { anexo: 'Rotina do setor', nota: 'Não aparece com esse nome na norma. Retirado do controle por decisão do setor em 11/11/2026.', ativo: false }),
     t('furos', 'Angulação dos furos dos colimadores', S, { nota: 'Todos os colimadores.' }),
     t('mesa', 'Velocidade da mesa (corpo inteiro)', S),
     t('unif-ext', 'Uniformidade extrínseca (todos os colimadores)', S, { nota: 'Também após dano ao colimador.' }),

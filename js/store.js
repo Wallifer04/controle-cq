@@ -37,6 +37,7 @@ const demo = {
     d.registros.push(...novos); gravarDemo(d); return novos;
   },
   async criarTeste(t) { const d = lerDemo(); const novo = { ...t, id: `${t.eq}.x-${uid().slice(0, 8)}`, anexo: 'Rotina do setor', ordem: 900 + (d.novos || []).length }; d.novos = [...(d.novos || []), novo]; gravarDemo(d); return novo; },
+  async anularRegistro(id, motivo) { const d = lerDemo(); const r = d.registros.find(x => x.id === id); if (!r) throw new Error('Registro não encontrado'); r.anulado_em = new Date().toISOString(); r.anulado_por = d.usuario?.nome; r.anulado_motivo = motivo; gravarDemo(d); },
   async atualizarTeste(id, patch) { const d = lerDemo(); d.testes[id] = { ...(d.testes[id] || {}), ...patch }; gravarDemo(d); },
   async listarAutorizados() { return lerDemo().autorizados; },
   async autorizar(email, nome, admin) { const d = lerDemo(); d.autorizados = d.autorizados.filter(a => a.email !== email); d.autorizados.push({ email, nome, admin }); gravarDemo(d); },
@@ -109,6 +110,7 @@ const cloud = {
   async listarAutorizados() { const { data, error } = await sb.from('autorizados').select('*').order('nome'); if (error) throw new Error(error.message); return data; },
   async autorizar(email, nome, admin) { const { error } = await sb.from('autorizados').upsert({ email: email.toLowerCase(), nome, admin }); if (error) throw new Error(error.message); },
   async desautorizar(email) { const { error } = await sb.from('autorizados').delete().eq('email', email); if (error) throw new Error(error.message); },
+  async anularRegistro(id, motivo) { const { error } = await sb.rpc('anular_registro', { p_id: id, p_motivo: motivo }); if (error) throw new Error(error.message); },
   async chavePush() { const { data } = await sb.rpc('chave_push'); return data || null; },
   async salvarPush(sub) {
     const j = sub.toJSON();

@@ -563,7 +563,7 @@ button.hstat:hover { background: rgba(255,255,255,.2); } button.hstat:active { t
 body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none; }
 .kcol { transition: background .15s, border-color .15s, box-shadow .15s; }
 .kcol.alvo { background: var(--royal-tint); border-color: var(--royal); box-shadow: 0 0 0 3px var(--royal-tint-2); }
-.kcol.nao { background: var(--red-tint); border-color: color-mix(in srgb, var(--red) 40%, transparent); }
+.kcol.volta { background: var(--red-tint); border-color: color-mix(in srgb, var(--red) 40%, transparent); }
 #toast.aviso svg { stroke: #FFC24D; }
 [hidden] { display: none !important; }
 .hero-text .btn { margin-right: 8px; }
@@ -593,3 +593,6 @@ body.em-arrasto { cursor: grabbing; user-select: none; -webkit-user-select: none
 /* aviso de versão nova */
 .atualiza { position: fixed; z-index: 120; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--royal); color: #fff; font-weight: 600; font-size: 14px; box-shadow: var(--shadow-3); width: max-content; max-width: calc(100vw - 24px); }
 @media (min-width: 900px) { .atualiza { bottom: 28px; } }
+
+/* registros desfeitos */
+.cell.desfeito .cell-title { text-decoration: line-through; opacity: .6; }

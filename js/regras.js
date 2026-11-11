@@ -91,7 +91,8 @@ export const PRAZO_ETAPA = 2;
 function pascoa(y) { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3),
   h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
   return new Date(y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1); }
-const FIXOS = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '11-20', '12-25'];
+// nacionais + 9 de julho (estadual de SP) + 28 de outubro (Dia do Servidor Público)
+const FIXOS = ['01-01', '04-21', '05-01', '07-09', '09-07', '10-12', '10-28', '11-02', '11-15', '11-20', '12-25'];
 // Feriados nacionais (fixos + Sexta-feira Santa). Feriados locais e pontos facultativos não entram.
 export function ehFeriado(d) {
   if (FIXOS.includes(iso(d).slice(5))) return true;
