@@ -41,7 +41,7 @@ function gama(id, comCT) {
     t('furos', 'Angulação dos furos dos colimadores', S, { nota: 'Todos os colimadores.' }),
     t('mesa', 'Velocidade da mesa (corpo inteiro)', S),
     t('unif-ext', 'Uniformidade extrínseca (todos os colimadores)', S, { nota: 'Também após dano ao colimador.' }),
-    t('res-ext', 'Resolução e linearidade espacial extrínsecas', S, { nota: 'Na planilha era anual. A tabela da norma está ilegível nessa linha, mas a nota do Anexo II manda fazer os testes extrínsecos a cada 6 meses.' }),
+    t('res-ext', 'Resolução e linearidade espacial extrínsecas', A, { nota: 'Anual por decisão do setor (11/11/2026), como na planilha. A tabela do Anexo II está ilegível nessa linha.' }),
     t('spect', 'Desempenho geral SPECT (tomográfico)', S),
     t('unif-ga', 'Uniformidade intrínseca – Gálio', A),
     t('unif-tl', 'Uniformidade intrínseca – Tálio', A),

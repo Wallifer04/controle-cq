@@ -39,7 +39,7 @@ Os testes vencem no **mês** em que completam a periodicidade (como na planilha 
 No iPhone, os avisos só funcionam com o site instalado: Compartilhar › Adicionar à Tela de Início (iOS 16.4 ou mais novo).
 
 ## Pontos da norma a confirmar
-- **Resolução e linearidade espacial extrínsecas (gama câmaras):** a planilha usava anual. A célula da tabela do Anexo II está ilegível ("A A"), mas a nota do anexo diz que os testes extrínsecos são semestrais. Ficou **semestral**.
+- **Resolução e linearidade espacial extrínsecas (gama câmaras):** **anual**, por decisão do setor em 11/11/2026 (como na planilha). A célula da tabela do Anexo II está ilegível; a nota do anexo fala em testes extrínsecos semestrais.
 - **Tempo morto:** não aparece com esse nome na norma; mantido como semestral por estar na planilha.
 - **Testes mensais das gama câmaras** (uniformidade de alta contagem, resolução/linearidade intrínsecas, centro de rotação) não estavam na planilha e foram incluídos como a norma pede.
 - **PET/CT:** a norma não lista testes do tomógrafo (CT) separadamente; só o corregistro PET/CT e o desempenho PET/CT. Os testes do CT seguem a regulação da Anvisa (RDC 611/2022 e IN 93/2021) e não estão aqui. O teste de resolução temporal TOF foi omitido porque o Biograph TruePoint não tem TOF (confirmar).
