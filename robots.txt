@@ -1,2 +1,3 @@
+# O site pede para não ser listado pela etiqueta noindex do index.html.
 User-agent: *
-Disallow: /
+Allow: /
