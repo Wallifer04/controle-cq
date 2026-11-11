@@ -247,7 +247,7 @@ function telaQuadro() {
       ${col('var(--royal)', 'Relatório realizado', `Assinatura em até ${PRAZO_ETAPA} dias úteis`, e2, 'etapa', 'Nenhum relatório aguardando assinatura.', 2)}
       ${col('var(--green)', 'Relatório assinado', 'Concluídos recentemente', feitos, 'feito', 'Os testes concluídos aparecem aqui.', 3)}
     </div>
-    <p class="note">Arraste o cartão para a coluna seguinte para avançar a etapa, ou para uma coluna anterior para desfazer (no celular, segure o cartão por um instante e arraste). Toque no cartão para ver os detalhes. O prazo conta em dias úteis e pula sábados, domingos e feriados (nacionais, 9 de julho e Dia do Servidor Público).</p>`;
+    <p class="note">Arraste o cartão para a coluna seguinte para avançar a etapa (no celular, segure o cartão por um instante e arraste). Toque no cartão para ver os detalhes. O prazo conta em dias úteis e pula sábados, domingos e feriados (nacionais, 9 de julho e Dia do Servidor Público).</p>`;
 }
 
 // ---------- arrastar no quadro ----------
@@ -258,11 +258,7 @@ function soltarNoQuadro(id, de, para) {
   if (para === de) return;
   const regs = S.porTeste.get(id) || [], hoje = hojeISO(), et = etapas(t), s = S.sit.get(id);
   if (para < de) {
-    // voltar coluna = desfazer as etapas, da última para a primeira, com motivo
-    const lista = et.importado ? (para === 0 ? [s.ultima] : []) : [de >= 3 ? et.concluido : null, de >= 2 && para <= 1 ? et.relatorio : null, para === 0 ? s.ultima : null].filter(Boolean);
-    if (!lista.length) return toast('Este registro veio da planilha e não tem etapas para desfazer.', 'alert');
-    if (!lista.every(podeDesfazer)) return toast('Só quem registrou ou o administrador pode desfazer.', 'alert');
-    return abrirDesfazer(t, lista);
+    return toast('Não dá para voltar uma etapa pelo quadro.', 'alert');
   }
   if (de === 0) {
     // novo teste: se está fora do prazo, precisa da justificativa no formulário
@@ -303,7 +299,7 @@ function iniciarArrasto(card, x, y) {
 function moverArrasto(x, y) {
   const a = arrasto; a.ghost.style.left = (x - a.dx) + 'px'; a.ghost.style.top = (y - a.dy) + 'px';
   const col = [...document.querySelectorAll('[data-kcol]')].find(c => { const r = c.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top - 40 && y <= r.bottom + 40; }) || null;
-  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'nao'));
+  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'volta'));
   a.alvo = col ? +col.dataset.kcol : null;
   if (col && a.alvo !== a.de) col.classList.add(a.alvo > a.de ? 'alvo' : 'volta');
   // rola o quadro quando chega perto das bordas (celular)
@@ -315,7 +311,7 @@ function fimArrasto(soltar) {
   clearTimeout(a.timer);
   if (!a.ativo) return;
   a.ghost.remove(); a.card.classList.remove('arrastando'); document.body.classList.remove('em-arrasto');
-  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'nao'));
+  document.querySelectorAll('.kcol.alvo, .kcol.volta').forEach(c => c.classList.remove('alvo', 'volta'));
   ignorarClique = true; setTimeout(() => { ignorarClique = false; }, 350);
   if (soltar && a.alvo != null) soltarNoQuadro(a.id, a.de, a.alvo);
 }
@@ -453,7 +449,6 @@ function telaHistorico() {
         <button data-filtro-hist="todos" aria-pressed="${f === 'todos'}">Todos</button>
         <button data-filtro-hist="atrasados" aria-pressed="${f === 'atrasados'}">Com justificativa</button>
         <button data-filtro-hist="nc" aria-pressed="${f === 'nc'}">Não conformes</button>
-        <button data-filtro-hist="desfeitos" aria-pressed="${f === 'desfeitos'}">Desfeitos</button>
       </div>
     </div>
     <div class="group" id="hist-lista">${vis.length ? vis.map(r => {
@@ -657,7 +652,7 @@ function stepper(t) {
     ${ETAPAS.map((e, i) => `<div class="step ${i < et.n ? 'done' : i === et.n ? 'next' : ''}"><span class="step-n">${i < et.n ? ic('check', '') : i + 1}</span>
       <div class="step-b"><b>${e.nome}</b><span>${i < et.n ? info[i] : i === et.n ? (et.atrasada ? `<b class="tarde">Atrasado. O prazo era ${fmtData(et.prazo)}</b>` : `Prazo: até ${fmtData(et.prazo)}`) : `Até ${PRAZO_ETAPA} dias úteis depois do relatório`}</span></div>${acao(i)}</div>`).join('')}
     ${et.n === 1 && !et.atrasada ? `<button class="btn btn-plain btn-sm steps-all" data-etapa="ambos">Marcar relatório realizado e assinado de uma vez</button>` : ''}
-    ${podeDesfazer(ultimoReg(t)) ? `<button class="btn btn-plain btn-sm steps-all" style="color:var(--red)" data-desfazer>Desfazer: ${NOME_ETAPA[ultimoReg(t).tipo]}</button>` : ''}</div>`;
+    </div>`;
 }
 
 function abrirRegistro(id, colAlvo = 1) {
