@@ -2,6 +2,7 @@ import { store } from './store.js';
 import { CONFIG } from '../config.js';
 import { NORMA } from './catalogo.js';
 import { ic } from './icones.js';
+import { gerarPlanilha } from './planilha.js';
 import {
   situacao, exigeJustificativa, somaPer, nomePer, fmtData, fmtMes, fmtVenc, fmtMesLongo, hojeISO, parse, iso,
   porMes, ehRotina, ROTULO, MESES_LONGOS, ultimaExecucao, ETAPAS, etapasDe, somaDiasUteis, PRAZO_ETAPA,
@@ -442,7 +443,7 @@ function telaHistorico() {
   const vis = regs.slice(0, 300);
   return `
     <div class="page-head"><div><div class="eyebrow">${S.regs.length} registros</div><h1 class="large-title">Histórico</h1></div>
-      <button class="btn btn-tinted btn-sm" data-acao="csv">${ic('download')}Exportar planilha</button></div>
+      <button class="btn btn-tinted btn-sm" data-acao="xlsx">${ic('download')}Exportar planilha</button></div>
     <div class="toolbar">
       <label class="search"><span class="sr">Buscar</span>${ic('search')}<input class="input" id="busca" type="search" placeholder="Buscar teste, equipamento ou pessoa" value="${esc(S.busca)}"></label>
       <div class="seg" role="group" aria-label="Filtro">
@@ -530,6 +531,7 @@ document.addEventListener('click', async ev => {
   if (a === 'atualizar') { toast('Buscando a versão mais recente…'); return setTimeout(aplicarAtualizacao, 500); }
   if (a === 'testar-notif') return notificar('Controle de CQ', 'Os avisos estão funcionando neste aparelho.');
   if (a === 'sair') { await store.sair(); S.user = null; return telaLogin(); }
+  if (a === 'xlsx') return exportarPlanilha();
   if (a === 'csv') return exportarCSV();
   if (a === 'autorizar') return abrirAutorizar();
   if (a === 'novo-teste') return abrirNovoTeste(el.dataset.eq);
@@ -844,7 +846,7 @@ function abrirAutorizar() {
 let swReg = null;
 // ---------- atualização do app ----------
 // Compara a "assinatura" dos arquivos publicados com a que estava no ar quando o app abriu.
-const ARQ_VERSAO = ['index.html', 'styles.css', 'config.js', 'sw.js', 'js/app.js', 'js/store.js', 'js/regras.js', 'js/catalogo.js', 'js/icones.js'];
+const ARQ_VERSAO = ['index.html', 'styles.css', 'config.js', 'sw.js', 'js/app.js', 'js/store.js', 'js/regras.js', 'js/catalogo.js', 'js/icones.js', 'js/planilha.js'];
 let versaoAberta = null, conferidoEm = 0, atualizando = false;
 async function assinatura() {
   try {
@@ -948,6 +950,15 @@ function avisosLocais(forcar = false) {
 }
 
 // ---------------- exportar ----------------
+// Planilha no formato dos quadros do mural: uma aba por quadro e uma com o histórico.
+function exportarPlanilha() {
+  try {
+    const blob = gerarPlanilha({ eqs: S.eqs, testes: S.todos, regs: S.regs, hoje: hojeISO() });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `controle-cq-${hojeISO()}.xlsx`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Planilha gerada com uma aba para cada quadro.');
+  } catch (e) { console.error(e); toast('Não foi possível gerar a planilha.', 'alert'); }
+}
 function exportarCSV() {
   const linhas = [['Data', 'Equipamento', 'Teste', 'Periodicidade', 'Tipo', 'Resultado', 'Com atraso', 'Justificativa', 'Observação', 'Responsável', 'Desfeito em', 'Desfeito por', 'Motivo']];
   [...S.regsTodos].sort((a, b) => b.data.localeCompare(a.data)).forEach(r => { const t = testeDe(r.teste_id); if (!t) return;

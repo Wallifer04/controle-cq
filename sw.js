@@ -1,6 +1,6 @@
 // Service worker: deixa o app instalável, funciona com internet fraca e recebe notificações push.
-const CACHE = 'cqmn-v2';
-const ARQUIVOS = ['./', 'index.html', 'styles.css', 'config.js', 'js/app.js', 'js/store.js', 'js/regras.js', 'js/catalogo.js', 'js/icones.js',
+const CACHE = 'cqmn-v3';
+const ARQUIVOS = ['./', 'index.html', 'styles.css', 'config.js', 'js/app.js', 'js/store.js', 'js/regras.js', 'js/catalogo.js', 'js/icones.js', 'js/planilha.js',
   'fonts/fredoka-latin-600-normal.woff2', 'fonts/fredoka-latin-700-normal.woff2', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/badge-72.png'];
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQUIVOS)).catch(() => {})); self.skipWaiting(); });
