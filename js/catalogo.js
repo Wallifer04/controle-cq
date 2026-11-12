@@ -14,8 +14,8 @@ export const EQUIPAMENTOS = [
   { id: 'captus', nome: 'Captus 3000', tipo: 'Captador', modelo: 'Sonda de captação Captus 3000', icone: 'captus' },
   { id: 'gm-insp', nome: 'Inspector V2', tipo: 'Geiger-Müller', modelo: 'Monitor de taxa de dose e contaminação', icone: 'gm' },
   { id: 'gm-redeye', nome: 'RedEye B20', tipo: 'Geiger-Müller', modelo: 'Monitor de taxa de dose e contaminação', icone: 'gm' },
-  { id: 'probe-nova', nome: 'Gama probe nova', tipo: 'Gama probe', modelo: 'Sonda intraoperatória', icone: 'probe' },
-  { id: 'probe-antiga', nome: 'Gama probe antiga', tipo: 'Gama probe', modelo: 'Sonda intraoperatória', icone: 'probe' },
+  { id: 'probe-nova', nome: 'Probe - Modelo 3.2', tipo: 'Gama probe', modelo: 'Sonda intraoperatória', icone: 'probe' },
+  { id: 'probe-antiga', nome: 'Probe - Modelo 3', tipo: 'Gama probe', modelo: 'Sonda intraoperatória', icone: 'probe' },
 ];
 
 const D = { n: 1, u: 'd' }, W = { n: 1, u: 'w' }, M = { n: 1, u: 'm' }, T = { n: 3, u: 'm' },
@@ -77,9 +77,10 @@ function pet() {
 function ativimetro() {
   const t = (slug, nome, per, tol, extra = {}) => ({ id: `ativ.${slug}`, eq: 'ativ', nome, per, tol, anexo: 'Anexo V', ...extra });
   return [
-    t('exat', 'Exatidão', S, '±10%'),
-    t('prec', 'Precisão', S, '±5%'),
-    t('linear', 'Linearidade', A, '±10%'),
+    t('exat', 'Precisão e exatidão', S, 'exatidão ±10%, precisão ±5%'),
+    t('prec', 'Precisão', S, '±5%', { ativo: false, nota: 'Unido a "Precisão e exatidão" por decisão do setor em 12/11/2026.' }),
+    t('linear', 'Linearidade – Tecnécio-99m', S, '±10%'),
+    t('linear-f18', 'Linearidade – Flúor-18', S, '±10%'),
     t('geom', 'Geometria (fatores de calibração)', A),
   ];
 }
@@ -92,7 +93,7 @@ function gm(id) {
   ];
 }
 
-const probe = id => [{ id: `${id}.repet`, eq: id, nome: 'Repetibilidade', per: S, tol: 'desvio padrão < 10%', anexo: 'Anexo III' }];
+const probe = id => [{ id: `${id}.repet`, eq: id, nome: 'Repetibilidade e sensibilidade', per: S, tol: 'desvio padrão < 10%', anexo: 'Anexo III' }];
 
 export const TESTES = [
   ...gama('nm630', false),

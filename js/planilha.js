@@ -32,7 +32,7 @@ const E = { titulo: 1, cab: 2, grupo: 3, teste: 4, cel: 5, amarelo: 6, azul: 7, 
 const ordemPer = per => per.u === 'd' ? 0 : per.u === 'w' ? 0.5 : per.n;
 const letraPer = per => per.u === 'd' ? 'D' : per.u === 'w' ? 'Sem.' : ({ 1: 'M', 3: 'T', 6: 'S', 12: 'A', 24: 'B' })[per.n] || `${per.n}m`;
 
-function meses(t, regs, ano, hoje, corE) {
+function meses(t, regs, ano, hoje, corE, semTraco = false) {
   const execs = regs.filter(r => r.teste_id === t.id && r.tipo === 'execucao' && !r.anulado_em);
   const mesAtual = hoje.slice(0, 4) > String(ano) ? 12 : hoje.slice(0, 4) < String(ano) ? -1 : +hoje.slice(5, 7) - 1;
   // meses previstos: cada execução marca o vencimento seguinte (execução + periodicidade)
@@ -43,7 +43,7 @@ function meses(t, regs, ano, hoje, corE) {
     const doMes = execs.filter(r => r.data.slice(0, 7) === chave);
     const acomp = doMes.length && doMes.every(r => /^Acompanhamento/.test(r.observacao || ''));
     // mensais ficam em branco quando não há registro (o setor preenche à mão); os demais levam traço nos meses passados
-    const v = doMes.length ? (acomp ? 'A' : 'OK') : (m < mesAtual && !previstos.has(m) && !(t.per.u === 'm' && t.per.n === 1) ? '–' : '');
+    const v = doMes.length ? (acomp ? 'A' : 'OK') : (m < mesAtual && !previstos.has(m) && !semTraco && !(t.per.u === 'm' && t.per.n === 1) ? '–' : '');
     return { v, s: previstos.has(m) ? corE : E.cel };
   });
 }
@@ -105,7 +105,7 @@ function abaInstrumentos(eqs, testes, regs, ano, hoje) {
     for (const e of eqs.filter(x => x.tipo === tipo)) {
       const ts = testes.filter(t => t.eq === e.id); if (!ts.length) continue;
       mesclar(a, l, 2, l + ts.length - 1, 2, e.nome, E.negrito);
-      for (const t of ts) { por(a, l, 3, t.nome, E.grupo); por(a, l, 4, letraPer(t.per), E.grupo); meses(t, regs, ano, hoje, E.verde).forEach((m, k) => por(a, l, 5 + k, m.v, m.s)); a.alturas[l] = 26; l++; }
+      for (const t of ts) { por(a, l, 3, t.nome, E.grupo); por(a, l, 4, letraPer(t.per), E.grupo); meses(t, regs, ano, hoje, E.verde, tipo === 'Geiger-Müller').forEach((m, k) => por(a, l, 5 + k, m.v, m.s)); a.alturas[l] = 26; l++; }
     }
     if (l > ini) mesclar(a, ini, 1, l - 1, 1, TIPO_QUADRO[tipo] || tipo.toUpperCase(), E.negrito);
   }
