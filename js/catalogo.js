@@ -24,9 +24,9 @@ const D = { n: 1, u: 'd' }, W = { n: 1, u: 'w' }, M = { n: 1, u: 'm' }, T = { n:
 function gama(id, comCT) {
   const t = (slug, nome, per, extra = {}) => ({ id: `${id}.${slug}`, eq: id, nome, per, anexo: 'Anexo II', ...extra });
   const lista = [
-    t('unif-alta', 'Uniformidade intrínseca (alta contagem)', M, { nota: 'Se disponível no equipamento.' }),
-    t('res-int', 'Resolução e linearidade espacial intrínsecas', M),
-    t('cor', 'Centro de rotação SPECT', M, { nota: 'Desvio, alinhamento com o eixo Y e inclinação do detector.' }),
+    t('unif-alta', 'Uniformidade intrínseca (alta contagem)', M, { ativo: false, nota: 'Rotina mensal: fora do controle do site por decisão do setor em 12/11/2026 (linha em branco na planilha).' }),
+    t('res-int', 'Resolução e linearidade espacial intrínsecas', M, { ativo: false, nota: 'Rotina mensal: fora do controle do site por decisão do setor em 12/11/2026 (linha em branco na planilha).' }),
+    t('cor', 'Centro de rotação SPECT', M, { ativo: false, nota: 'Rotina mensal: fora do controle do site por decisão do setor em 12/11/2026 (linha em branco na planilha).' }),
     t('res-energ', 'Resolução energética', S),
     t('resp-ga', 'Resolução espacial multienergética – Gálio', S),
     t('resp-tl', 'Resolução espacial multienergética – Tálio', S),

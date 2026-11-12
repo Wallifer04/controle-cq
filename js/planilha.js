@@ -7,9 +7,11 @@ const MES = ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Se
 const NORMA_QUADRO = 'Controle de Qualidade conforme as Normas ANSN 3.05 e Anvisa RDC 38/2008';
 
 // Dados de identificação que estão nos quadros de papel.
+// Testes mensais de rotina das gama câmaras: o site não controla, mas a linha sai em branco para preencher à mão.
+const MENSAIS_GAMA = ['UNIFORMIDADE INTRÍNSECA (ALTA CONTAGEM)', 'RESOLUÇÃO E LINEARIDADE ESPACIAL INTRÍNSECAS', 'CENTRO DE ROTAÇÃO SPECT'].map(nome => ({ grupo: 'MENSAL', nome }));
 const QUADROS = {
-  nm630: { aba: 'NM 630', titulo: 'DISCOVERY NM 630  - Nº SÉRIE: 22538 - PATRIMÔNIO: 016886', cor: 6 },
-  nm670: { aba: 'NM-CT 670', titulo: 'DISCOVERY NM/CT 670  - Nº SÉRIE: 21351 - PATRIMÔNIO: 005988', cor: 7 },
+  nm630: { aba: 'NM 630', titulo: 'DISCOVERY NM 630  - Nº SÉRIE: 22538 - PATRIMÔNIO: 016886', cor: 6, extras: MENSAIS_GAMA },
+  nm670: { aba: 'NM-CT 670', titulo: 'DISCOVERY NM/CT 670  - Nº SÉRIE: 21351 - PATRIMÔNIO: 005988', cor: 7, extras: MENSAIS_GAMA },
   petct: { aba: 'PET-CT', titulo: 'PET/CT Siemens Biograph 16 TruePoint  - Nº SÉRIE: 72540 - PATRIMÔNIO: 005751', cor: 8,
     extras: [{ grupo: 'SEMANAL', nome: 'UNIFORMIDADE' }] },
 };
