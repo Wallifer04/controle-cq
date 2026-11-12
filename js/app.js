@@ -49,6 +49,13 @@ function contagens() {
   Object.values(c).forEach(l => l.sort(ord));
   return c;
 }
+// testes que pedem providência antes do vencimento (ex.: calibração, que depende de chamado na engenharia clínica)
+function antecipados() {
+  const agora = new Date(), base = agora.getFullYear() * 12 + agora.getMonth();
+  return periodicos().filter(t => { const s = S.sit.get(t.id); if (!(t.aviso_meses > 0) || !s.venc || s.estado === 'atrasado' || s.estado === 'mes') return false;
+    const v = parse(s.venc), dm = v.getFullYear() * 12 + v.getMonth() - base; return dm >= 1 && dm <= t.aviso_meses; })
+    .sort((a, b) => S.sit.get(a.id).venc.localeCompare(S.sit.get(b.id).venc));
+}
 const mesRef = (n = 0) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + n); return d; };
 const nomeMes = (n = 0) => MESES_LONGOS[mesRef(n).getMonth()];
 
@@ -189,6 +196,7 @@ function telaInicio() {
       <div class="dash-main">
         <section class="section" id="atrasados"><div class="section-head"><h2 class="section-title"><span class="sdot red"></span>Em atraso</h2><span class="section-sub">Registro exige justificativa</span></div>${lista(c.atrasado, 'Nenhum teste atrasado.')}</section>
         <section class="section" id="este-mes"><div class="section-head"><h2 class="section-title"><span class="sdot sky"></span>Vencem em ${nomeMes(0)}</h2><span class="section-sub">Fazer até o fim do mês</span></div>${lista(c.mes, 'Nada mais vence neste mês.')}</section>
+        ${antecipados().length ? `<section class="section" id="antecipar"><div class="section-head"><h2 class="section-title"><span class="sdot sky"></span>Providenciar com antecedência</h2><span class="section-sub">Abrir o chamado na engenharia clínica</span></div>${lista(antecipados(), '')}</section>` : ''}
         ${c.sem.length ? `<div class="group quiet">
           ${c.sem.length ? `<a class="cell" href="#equipamentos"><div class="cell-ico" style="background:var(--fill);color:var(--label-2)">${ic('list')}</div><div class="cell-body"><div class="cell-title">${c.sem.length} testes ainda sem registro</div><div class="cell-sub">Registre a última execução para começar a contar o vencimento</div></div><div class="cell-trail">${ic('chevR', 'i chev')}</div></a>` : ''}
         </div>` : ''}

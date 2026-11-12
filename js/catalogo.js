@@ -88,8 +88,8 @@ function ativimetro() {
 function gm(id) {
   return [
     { id: `${id}.reprod`, eq: id, nome: 'Reprodutibilidade', per: M, tol: 'até 20%', anexo: 'Art. 26' },
-    { id: `${id}.calib`, eq: id, nome: 'Calibração em laboratório acreditado', per: B, anexo: 'Art. 20 §5º',
-      nota: 'A cada 2 anos e após conserto. O monitor principal e o reserva devem ser calibrados em datas diferentes.' },
+    { id: `${id}.calib`, eq: id, nome: 'Calibração em laboratório acreditado', per: B, anexo: 'Art. 20 §5º', aviso_meses: 2,
+      nota: 'A cada 2 anos e após conserto. O monitor principal e o reserva devem ser calibrados em datas diferentes. Aviso com 2 meses de antecedência para abrir o chamado na engenharia clínica.' },
   ];
 }
 

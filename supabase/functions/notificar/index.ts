@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
   webpush.setVapidDetails(cfg.vapid_subject || Deno.env.get('SUPABASE_URL')!, cfg.vapid_public, cfg.vapid_private);
 
   const [{ data: testes }, { data: eqs }, { data: regs }, { data: subs }] = await Promise.all([
-    sb.from('testes').select('id, nome, per_n, per_u, equipamento_id').eq('ativo', true),
+    sb.from('testes').select('id, nome, per_n, per_u, equipamento_id, aviso_meses').eq('ativo', true),
     sb.from('equipamentos').select('id, nome'),
     sb.from('registros').select('id, teste_id, data, tipo, ref_id, usuario_nome').in('tipo', ['execucao', 'relatorio', 'concluido']),
     sb.from('push_subs').select('*'),
@@ -75,13 +75,15 @@ Deno.serve(async (req) => {
   for (const [k, r] of ultReg) ult.set(k, r.data);
   const nomeEq = new Map((eqs || []).map((e) => [e.id, e.nome]));
   const hoje = hojeSP();
-  const proximo: string[] = [], atrasados: string[] = [];
+  const proximo: string[] = [], atrasados: string[] = [], antecipar: string[] = [];
   for (const t of testes) {
     if (t.per_u !== 'm') continue; // diários/semanais não geram aviso
     const u = ult.get(t.id); if (!u) continue;
     const dm = mesIdx(soma(u, t.per_n, t.per_u)) - mesIdx(hoje);
     const rot = `${t.nome} (${nomeEq.get(t.equipamento_id)})`;
     if (dm === 1) proximo.push(rot); else if (dm < 0) atrasados.push(rot);
+    // testes que pedem providência antes (ex.: calibração): avisa quando faltam exatamente aviso_meses meses
+    if (t.aviso_meses > 1 && dm === t.aviso_meses) antecipar.push(`${rot}, vence em ${MESES[(hoje.getUTCMonth() + dm) % 12]}`);
   }
 
   // etapas com prazo vencendo hoje ou vencido
@@ -103,6 +105,8 @@ Deno.serve(async (req) => {
   if (atrasados.length && (hoje.getUTCDay() === 1 || forcar)) avisos.push({ chave: `atr-${semana}`, title: `${atrasados.length} teste${atrasados.length > 1 ? 's' : ''} atrasado${atrasados.length > 1 ? 's' : ''}`, body: atrasados.slice(0, 5).join('; ') + (atrasados.length > 5 ? '…' : '') });
 
   if (etapas.length && (diaUtil(hoje) || forcar)) avisos.push({ chave: `etapa-${hojeS}`, title: `${etapas.length} pendência${etapas.length > 1 ? 's' : ''} de relatório ou assinatura`, body: etapas.slice(0, 5).join('; ') + (etapas.length > 5 ? '…' : '') });
+
+  if (antecipar.length) avisos.push({ chave: `ant-${mesK}`, title: 'Abrir chamado: calibração a vencer', body: antecipar.slice(0, 5).join('; ') + (antecipar.length > 5 ? '…' : '') });
 
   let enviados = 0;
   for (const a of avisos) {

@@ -18,7 +18,8 @@ create table if not exists public.equipamentos (
   tipo text,
   modelo text,
   icone text,
-  ordem int not null default 0
+  ordem int not null default 0,
+  aviso_meses smallint not null default 0 -- meses de antecedência para avisar (ex.: calibração)
 );
 
 create table if not exists public.testes (
@@ -31,7 +32,8 @@ create table if not exists public.testes (
   tol text,
   nota text,
   ativo boolean not null default true,
-  ordem int not null default 0
+  ordem int not null default 0,
+  aviso_meses smallint not null default 0 -- meses de antecedência para avisar (ex.: calibração)
 );
 
 create table if not exists public.registros (
