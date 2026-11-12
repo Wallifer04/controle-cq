@@ -64,13 +64,13 @@ function pet() {
     t('sens', 'Sensibilidade', A),
     t('espalh', 'Fração de espalhamento', A),
     t('janela', 'Largura da janela de coincidência', A),
-    t('corte', 'Espessura de corte', A),
+    t('corte', 'Espessura de corte', A, { ativo: false, nota: 'Retirado do controle por decisão do setor em 12/11/2026.' }),
     t('nec', 'Desempenho da taxa de contagem (NEC)', A),
-    t('verd', 'Taxa de eventos verdadeiros', A),
+    t('verd', 'Taxa de eventos verdadeiros', A, { ativo: false, nota: 'Retirado do controle por decisão do setor em 12/11/2026.' }),
     t('aleat', 'Taxa de eventos aleatórios', A),
-    t('desemp-pet', 'Desempenho geral PET (simulador)', A),
+    t('desemp-pet', 'Desempenho geral PET (simulador)', A, { ativo: false, nota: 'Retirado do controle por decisão do setor em 12/11/2026.' }),
     t('desemp-petct', 'Desempenho geral PET/CT (simulador)', A),
-    t('mec', 'Partes mecânicas do equipamento', A),
+    t('mec', 'Partes mecânicas do equipamento', A, { ativo: false, nota: 'Retirado do controle por decisão do setor em 12/11/2026.' }),
   ];
 }
 

@@ -42,7 +42,8 @@ function meses(t, regs, ano, hoje, corE) {
     const chave = `${ano}-${String(m + 1).padStart(2, '0')}`;
     const doMes = execs.filter(r => r.data.slice(0, 7) === chave);
     const acomp = doMes.length && doMes.every(r => /^Acompanhamento/.test(r.observacao || ''));
-    const v = doMes.length ? (acomp ? 'A' : 'OK') : (m < mesAtual && !previstos.has(m) ? '–' : '');
+    // mensais ficam em branco quando não há registro (o setor preenche à mão); os demais levam traço nos meses passados
+    const v = doMes.length ? (acomp ? 'A' : 'OK') : (m < mesAtual && !previstos.has(m) && !(t.per.u === 'm' && t.per.n === 1) ? '–' : '');
     return { v, s: previstos.has(m) ? corE : E.cel };
   });
 }
